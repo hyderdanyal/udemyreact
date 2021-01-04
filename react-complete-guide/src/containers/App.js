@@ -1,8 +1,15 @@
 import React, { Component } from 'react';
-import './App.css';
+import classes from './App.module.css';
 // import Radium,{StyleRoot} from "radium";
 // import styled from "styled-components";
-import Person from './Person/Person';
+// import Person from '../components/Persons/Person/Person';
+import ErrorBoundary from '../ErrorBoundary/errorboundary'
+import person from '../components/Persons/Person/Person';
+import Persons from '../components/Persons/Persons';
+import Cockpit from '../components/Cockpit/Cockpit';
+import WithClass from '../HigherOrderComponents/WithClass' 
+import Aux from "../HigherOrderComponents/Auxillary"
+import AuthContext from "../context/auth-context"
 
 // const StyledButton = styled.button`
 //       background-color:${props => props.colorchange? 'red' : 'green'};
@@ -22,10 +29,30 @@ class App extends Component {
     persons: [
       {id:1, name:'cash', age:28},
       {id:2, name:"Manuel", age:20}
-    ]
-  }
-    
+    ],
+    showCockpit:true,
+    changeCounter:0
+  };
 
+  static getDerivedStateFromProps(props,state){
+    console.log('[App.js] get dervied state from props', props);
+    return state
+  }    
+
+  componentDidMount(){
+    console.log('[App.js] mounted component')
+  }
+
+  shouldComponentUpdate(nextProps,nextState){
+    console.log('[App.js] shouldComponentUpdate')
+    
+    return true;
+    
+  }
+
+  componentDidUpdate(){
+    console.log('[App.js] componentDidUpdate')
+  }
   
   switchNameHandler = (newName) =>{
     // Don't do this: this.state.persons[0].name = 'cheque';
@@ -42,7 +69,11 @@ class App extends Component {
 
     const persons = [...this.state.persons];
     persons[personIndex]=person;
-    this.setState({persons:persons})
+    this.setState((prevState,props)=>{
+      return {persons:persons, 
+        changeCounter:prevState.changeCounter+1}
+    }
+      )
 
     // this.setState({
     //   persons: [
@@ -66,6 +97,7 @@ class App extends Component {
   }
 
   render() {
+    console.log('[App.js] is rendering');
     // const style = {
     //   backgroundColor:"green",
     //   color:"white",
@@ -80,18 +112,27 @@ class App extends Component {
     // };
 
     let persons=null;
+    // let btnClass=[classes.Button];
+    // let btnClass='';
     
     if(this.state.showPersons) {
       persons= (
         <div>
-          {this.state.persons.map((person,index) => {
+          {/* {this.state.persons.map((person,index) => {
             return <Person click={() => this.deletePersonsHandler(index)} 
             name={person.name} age={person.age} id={person.id}
             changed={(event)=>this.changeNameHandler(event,person.id)}/>
           })
-          }
+          } */}
+          <Persons 
+          persons={this.state.persons}
+          clicked={this.deletePersonsHandler}
+          changed={this.changeNameHandler}/>
         </div>
       )
+
+      // btnClass.push(classes.Red);
+      // btnClass= classes.Red;
       // style.backgroundColor="red"
       // style[':hover']={
       //   backgroundColor:'salmon',
@@ -111,23 +152,31 @@ class App extends Component {
     //     </div>
     //   ); 
     // }
-    let classes = [];
-    if(this.state.persons.length >= 1){
-      classes.push("red")
-    }
-    if(this.state.persons.length === 1){
-      classes.push("bold")
-    }
+    // let assignedClasses = [];
+    // if(this.state.persons.length >= 1){
+    //   assignedClasses.push("red")
+    // }
+    // if(this.state.persons.length === 1){
+    //   assignedClasses.push("bold")
+    // }
     return (
       // <StyleRoot>
-      <div className="App">
-        <h1>HIIIIII </h1>
-        <p className={classes.join(" ")}>Hope this works</p>
+      // <div className={classes.App}>
+      // <WithClass classes={classes.App}>
+      <Aux>
+        <button onClick={() => {
+          this.setState({showCockpit:false})}}>Remove Cockpit</button>
+        {this.state.showCockpit ? (<Cockpit showPersons={this.state.showPersons}
+        persons={this.state.persons}
+        toggle={this.togglePersonsHandler}/>): null }
+        {/* <h1>HIIIIII </h1> */}
+        {/* <p className={assignedClasses.join(" ")}>Hope this works</p> */}
         {/* <button style={style}
         // onClick={this.switchNameHandler.bind(this,"Maxi")}
         onClick={this.togglePersonsHandler}> Toggle Person Div </button> */}
         {/* <StyledButton colorchange={this.state.showPersons} onClick={this.togglePersonsHandler}> Toggle Person Div </StyledButton> */}
-        
+        {/* <button className={btnClass.join(' ')} onClick={this.togglePersonsHandler}>Toggle Persons Div</button> */}
+        {/* <button className={btnClass} onClick={this.togglePersonsHandler}>Toggle Persons Div</button> */}
         {/* { this.state.showPersons? */}
           {/* // <div> */}
         {/* <Person name="cash" age="29">Namaste London</Person> */}
@@ -137,14 +186,18 @@ class App extends Component {
         {/* // changed={this.changeNameHandler}></Person> */}
         {/* </div>:null */}
         {/* // } */}
+        <ErrorBoundary key={person.id}>
         {persons}
-      </div>
-      // </StyleRoot>
+        </ErrorBoundary>
+        </Aux>
+        // </WithClass>
+      /* </div> */
+       /* </StyleRoot> */
     );
   }
 }
 
-export default App;
+export default WithClass(App, classes.App);
 // export default Radium(App);
 
 // const app = props => {

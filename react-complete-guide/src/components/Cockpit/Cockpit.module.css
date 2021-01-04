@@ -1,0 +1,27 @@
+:local(.red){
+    color: red;
+  }
+  :local(.bold){
+    font-weight: bold;
+  }
+  :local(.Button){
+    background-color: green;
+    color: white;
+    font: inherit;
+    border: 1px solid blue;
+    padding: 8px;
+    cursor: pointer;
+  }
+  
+  :local(.Button:hover) {
+    background-color: lightgreen;
+    color:black;
+  } 
+  
+  :local(.Button.Red){
+    background-color: red;
+  }
+  :local(.Button.Red:hover){
+    background-color: salmon;
+  }
+  
